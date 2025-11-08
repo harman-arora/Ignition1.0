@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Rider Telemetry Dashboard</title>
+  <style>
+    body { font-family: Arial; background: #111; color: #fff; text-align: center; padding: 40px; }
+    h1 { color: #00ffaa; }
+    .card { background: #222; margin: 10px; padding: 20px; border-radius: 10px; display: inline-block; width: 150px; }
+    .value { font-size: 1.5rem; color: #00ffaa; }
+  </style>
+</head>
+<body>
+  <h1>🏍 Rider Telemetry Dashboard</h1>
+
+  <div class="card">Accel X: <span id="ax" class="value">--</span></div>
+  <div class="card">Accel Y: <span id="ay" class="value">--</span></div>
+  <div class="card">Accel Z: <span id="az" class="value">--</span></div>
+  <div class="card">Mode: <span id="mode" class="value">--</span></div>
+
+  <script>
+    const ESP_URL = "http://192.168.xx.xx"; // replace with your ESP32 IP!!
+
+    async function fetchData() {
+      try {
+        const res = await fetch(ESP_URL);
+        const data = await res.json();
+        document.getElementById("ax").textContent = data.ax;
+        document.getElementById("ay").textContent = data.ay;
+        document.getElementById("az").textContent = data.az;
+
+        const total = Math.abs(data.ax) + Math.abs(data.ay) + Math.abs(data.az);
+        let mode = "Idle 💤";
+        if (total < 1) mode = "Walking 🚶";
+        else if (total < 3) mode = "Scooter 🛵";
+        else mode = "Motorcycle 🏍";
+        document.getElementById("mode").textContent = mode;
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    setInterval(fetchData, 500);
+  </script>
+</body>
+</html>
